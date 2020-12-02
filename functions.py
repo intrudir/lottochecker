@@ -8,7 +8,7 @@ headers = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
     "Accept-Language": "en-US,en;q=0.5", "Accept-Encoding": "gzip, deflate"}
 
-def createNumbers():
+def createNumbers(scriptDir):
     content = """\
 my numbers:
   powerball:
@@ -36,7 +36,7 @@ moms numbers:
     - 5
     - 6
 """
-    with open('numbers.yaml', 'w') as nf:
+    with open(scriptDir + '/numbers.yaml', 'w') as nf:
         nf.write(content)
     return True
 
