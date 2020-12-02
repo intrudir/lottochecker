@@ -17,8 +17,11 @@ optional arguments:
 ```
 <br>
 
-## Add the numbers you want to check in numbers.yaml </h3>
+## Add the numbers you want to check in numbers.yaml
 ![image](https://user-images.githubusercontent.com/24526564/100815324-9ee79e80-3411-11eb-9879-040fa7bb6ece.png)
+
+The first names can be whatever you want. eg. "my numbers", "my dogs numbers", whatever. <br>
+The only thing that matters is that the game names have at least "powerball" "megamillions", or "lotto" so you can call it "powerball2" or "powerball_2" etc.
 <br>
 
 ## Send results via email
