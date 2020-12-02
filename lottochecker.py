@@ -23,13 +23,14 @@ if len(sys.argv) <= 1:
     sys.exit(0)
 
 # Get numbers from numbers.yaml
+scriptDir = sys.path[0]
 try:
-    with open("numbers.yaml") as s:
+    with open(scriptDir + "/numbers.yaml") as s:
         numbers = yaml.load(s, Loader=yaml.FullLoader)
 except FileNotFoundError:
     print("You need to add your picks to 'numbers.yaml'. A template has been \
 created for you.")
-    createNumbers()
+    createNumbers(scriptDir)
     sys.exit(1)
 
 # Get winning numbers
