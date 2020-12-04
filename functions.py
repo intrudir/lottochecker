@@ -61,21 +61,21 @@ def getWinningNumbers(check):
     return winnerBalls
 
 
-def checkMyNums(check, numbers, winningNums, highest):
+def checkMyNums(check, myNumbers, winningNums, highest):
     d = date.today()
     msg = "Date: {}\n".format(d)
     msg += "Winning {} numbers: {}\n".format(check, winningNums)
 
     # my numbers:
-    for picks in numbers:
+    for picks in myNumbers:
         msg += "\n{}: ".format(picks)
 
         # powerball: [1, 2, 3, 4, 5, 6]
-        for game in numbers[picks]:
+        for game in myNumbers[picks]:
             matched = 0
             if game.lower().find(check) != -1:
-                msg += "\n    {}: {}".format(game, numbers[picks][game])
-                for n in numbers[picks][game]:
+                msg += "\n    {}: {}".format(game, myNumbers[picks][game])
+                for n in myNumbers[picks][game]:
                     if n in winningNums:
                         matched += 1
                 msg += "\n    {} numbers matched\n".format(matched)
@@ -85,6 +85,104 @@ def checkMyNums(check, numbers, winningNums, highest):
                     highest = matched
 
     return msg, matched, highest
+
+
+def getHistory(check):
+    if check == "powerball":
+        check = "pb.htm"
+    elif check == "megamillions":
+        check = "mmil.htm"
+    elif check == "lotto":
+        check = "l6.htm"
+
+    drawDate = ""
+    historyWinners = {}
+    numList = []
+    url = "https://www.flalottery.com/exptkt/{}".format(check)
+    response = requests.get(url, headers=headers)
+    soup = BeautifulSoup(response.content, 'html.parser')
+    tables = soup.find_all("table")
+    for a in tables:
+        # tr_top == every <tr valign="top">
+        tr_top = a.find_all("tr", {"valign": "top"})
+        for b in tr_top:
+            fonts = b.find_all("font", {"face": "helvetica"})
+            for c in fonts:
+                text = c.text
+
+                # get draw date
+                if '/' in text:
+                    drawDate = text
+
+                # append numbers to list
+                # need to check if drawDate has been set in order to avoid
+                # appending page numbers for each table.
+                try:
+                    int(text)
+                except ValueError:
+                    pass
+                else:
+                    if drawDate:
+                        numList.append(text)
+
+                # add numbers to a dictionary with draw date
+                # then reset number list
+                if len(numList) == 6:
+                    if drawDate in historyWinners:
+                        historyWinners[drawDate + " DP"] = numList
+                        numList = []
+                        drawDate = ""
+                    else:
+                        historyWinners[drawDate] = numList
+                        numList = []
+                        drawDate = ""
+    return historyWinners
+
+
+def checkHistory(check, myNumbers, historyWinners):
+    msg = ""
+    # my numbers:
+    for picks in myNumbers:
+        print("\n{}: ".format(picks))
+
+        for game in myNumbers[picks]:
+            if game.lower().find(check) != -1:
+                # powerball: [1, 2, 3, 4, 5, 6]
+                print("    {}: {}\n".format(game, myNumbers[picks][game]))
+
+                for drawDate, hNumbers in historyWinners.items():
+                    matched = 0
+                    pbMatched = False
+
+                    if check == "powerball" or check == "megamillions":
+                        for n in myNumbers[picks][game][:5]:
+                            if str(n) in hNumbers:
+                                matched += 1
+                        if str(myNumbers[picks][game][-1]) == hNumbers[-1]:
+                            pbMatched = True
+
+                        if matched == 5 and pbMatched is True:
+                            print("ALL 6 NUMBERS MATCHED: {}: {}".format(drawDate, hNumbers))
+                            print()
+
+                        if matched >= 3:
+                            print("3 or more numbers matched: {}: {}".format(drawDate, hNumbers))
+                            print("{} ball matched?: {}".format(check, pbMatched))
+                            print()
+
+                    if check == "lotto":
+                        for n in myNumbers[picks][game]:
+                            if str(n) in hNumbers:
+                                matched += 1
+
+                        if matched == 6:
+                            print("ALL 6 NUMBERS MATCHED: {}: {}".format(drawDate, hNumbers))
+                            print()
+
+                        if matched >= 4:
+                            print("4 or more numbers matched: {}: {}".format(drawDate, hNumbers))
+                            print()
+    exit()
 
 
 def sendMail(user, password, subject, finalResults):
