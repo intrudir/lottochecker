@@ -28,7 +28,7 @@ if len(sys.argv) <= 1:
     sys.exit(0)
 
 # Get numbers from numbers.yaml
-scriptDir = os.path.dirname(__file__)
+scriptDir = os.path.dirname(os.path.abspath(__file__))
 try:
     with open(scriptDir + "/numbers.yaml") as s:
         myNumbers = yaml.load(s, Loader=yaml.FullLoader)
