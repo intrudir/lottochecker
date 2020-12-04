@@ -1,4 +1,4 @@
-import argparse, yaml, sys
+import argparse, yaml, sys, os
 from functions import *
 
 # creds to send email with results
@@ -28,7 +28,7 @@ if len(sys.argv) <= 1:
     sys.exit(0)
 
 # Get numbers from numbers.yaml
-scriptDir = sys.path[0]
+scriptDir = os.path.dirname(__file__)
 try:
     with open(scriptDir + "/numbers.yaml") as s:
         myNumbers = yaml.load(s, Loader=yaml.FullLoader)
