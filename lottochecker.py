@@ -10,9 +10,14 @@ description="This script is used to check for lotto numbers and see if you won."
 )
 parser.add_argument(
     '-c', '--check',
-    action="store", default=False, dest='check',
+    action="store", default=None, dest='check',
     choices=("powerball", "megamillions", "lotto"),
     help="check winning numbers for specified game")
+
+parser.add_argument(
+    '--history',
+    action="store_true", default=False, dest='history',
+    help="check your numbers against historical data for a game")
 
 args = parser.parse_args()
 
@@ -26,22 +31,32 @@ if len(sys.argv) <= 1:
 scriptDir = sys.path[0]
 try:
     with open(scriptDir + "/numbers.yaml") as s:
-        numbers = yaml.load(s, Loader=yaml.FullLoader)
+        myNumbers = yaml.load(s, Loader=yaml.FullLoader)
 except FileNotFoundError:
     print("You need to add your picks to 'numbers.yaml'. A template has been \
 created for you.")
     createNumbers(scriptDir)
     sys.exit(1)
 
-# Get winning numbers
-highest = 0
-winners = getWinningNumbers(args.check)
-msg, matched, highest = checkMyNums(args.check, numbers, winners, highest)
-print(msg)
+if args.check and args.history:
+    # get historical data
+    historyWinners = getHistory(args.check)
+    #print(historyWinners["05/19/15"])
 
-# send the results by email
-mailSubject = "{}: highest numbers matched: {}".format(args.check, highest)
-try:
-    sendMail(user, password, mailSubject, msg)
-except smtplib.SMTPAuthenticationError:
-    print("Invalid email credentials.")
+    checkHistory(args.check, myNumbers, historyWinners)
+
+elif args.check and not args.history:
+    # Get winning numbers
+    winners = getWinningNumbers(args.check)
+
+    highest = 0
+    msg, matched, highest = checkMyNums(args.check, myNumbers, winners, highest)
+    print(msg)
+
+    # send the results by email
+    mailSubject = "{}: highest numbers matched: {}".format(args.check, highest)
+    try:
+        print()
+        sendMail(user, password, mailSubject, msg)
+    except smtplib.SMTPAuthenticationError:
+        print("Invalid email credentials.")
