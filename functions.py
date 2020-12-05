@@ -73,11 +73,25 @@ def checkMyNums(check, myNumbers, winningNums, highest):
         # powerball: [1, 2, 3, 4, 5, 6]
         for game in myNumbers[picks]:
             matched = 0
+            pbMatched = False
             if game.lower().find(check) != -1:
                 msg += "\n    {}: {}".format(game, myNumbers[picks][game])
-                for n in myNumbers[picks][game]:
-                    if n in winningNums:
-                        matched += 1
+
+                if check == "powerball":
+                    for n in myNumbers[picks][game][:5]:
+                        if n in winningNums[:5]:
+                            matched += 1
+
+                    if myNumbers[picks][game][-1] == winningNums[-1]:
+                        pbMatched = True
+
+                    msg += "\n    ball matched: {}".format(pbMatched)
+
+                if check == "lotto":
+                    for n in myNumbers[picks][game]:
+                        if n in winningNums:
+                            matched += 1
+
                 msg += "\n    {} numbers matched\n".format(matched)
 
             if matched:
@@ -156,18 +170,18 @@ def checkHistory(check, myNumbers, historyWinners):
 
                     if check == "powerball" or check == "megamillions":
                         for n in myNumbers[picks][game][:5]:
-                            if str(n) in hNumbers:
+                            if str(n) in hNumbers[:5]:
                                 matched += 1
                         if str(myNumbers[picks][game][-1]) == hNumbers[-1]:
                             pbMatched = True
 
                         if matched == 5 and pbMatched is True:
-                            print("ALL 6 NUMBERS MATCHED: {}: {}".format(drawDate, hNumbers))
+                            print("    ALL 6 NUMBERS MATCHED: {}: {}".format(drawDate, hNumbers))
                             print()
 
                         if matched >= 3:
-                            print("3 or more numbers matched: {}: {}".format(drawDate, hNumbers))
-                            print("{} ball matched?: {}".format(check, pbMatched))
+                            print("    3 or more numbers matched: {}: {}".format(drawDate, hNumbers))
+                            print("    {} ball matched?: {}".format(check, pbMatched))
                             print()
 
                     if check == "lotto":
