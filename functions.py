@@ -3,6 +3,7 @@ from datetime import date
 from bs4 import BeautifulSoup
 from email.message import EmailMessage
 
+
 headers = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0) Gecko/20100101 Firefox/78.0",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
@@ -51,6 +52,16 @@ def getWinningNumbers(check):
     soup = BeautifulSoup(response.content, 'html.parser')
     gamePageBalls = soup.find("div", {"class": "gamePageBalls"})
     balls = gamePageBalls.find_all("span", {"class": "balls"})
+
+    # get next jackpot date and amount
+    jackpotDiv = soup.find("div", {"class": "nextJackpot"}).find_all("p")
+    jDate = jackpotDiv[1].text
+    jPot = soup.find("p", {"class": "gameJackpot"}).text
+    jackpot = {"Next Jackpot: ": jDate, "Jackpot amount: ": jPot}
+
+    # get winnings table
+    winTable = soup.find("table", {"class": "style1 games"})
+
     winnerBalls = []
     for b in balls:
         try:
@@ -58,13 +69,16 @@ def getWinningNumbers(check):
         except ValueError:
             pass
 
-    return winnerBalls
+    return winnerBalls, jackpot, winTable
 
 
-def checkMyNums(check, myNumbers, winningNums, highest):
+def checkMyNums(check, myNumbers, winningNums, jackpot, highest):
     d = date.today()
     msg = "Date: {}\n".format(d)
-    msg += "Winning {} numbers: {}\n".format(check, winningNums)
+    msg += "Winning {} numbers: {}\n\n".format(check, winningNums)
+    for k, v in jackpot.items():
+        msg += "{}".format(k)
+        msg += "{}\n".format(v)
 
     # my numbers:
     for picks in myNumbers:
@@ -77,7 +91,7 @@ def checkMyNums(check, myNumbers, winningNums, highest):
             if game.lower().find(check) != -1:
                 msg += "\n    {}: {}".format(game, myNumbers[picks][game])
 
-                if check == "powerball":
+                if check == "powerball" or check == "megamillions":
                     for n in myNumbers[picks][game][:5]:
                         if n in winningNums[:5]:
                             matched += 1
