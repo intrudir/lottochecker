@@ -47,11 +47,11 @@ if args.check and args.history:
 
 elif args.check and not args.history:
     # Get winning numbers
-    winners = getWinningNumbers(args.check)
-
+    winners, jackpot, winTable = getWinningNumbers(args.check)
     highest = 0
-    msg, matched, highest = checkMyNums(args.check, myNumbers, winners, highest)
+    msg, matched, highest = checkMyNums(args.check, myNumbers, winners, jackpot, highest)
     print(msg)
+    msg += "\n\n"
 
     # send the results by email
     mailSubject = "{}: highest numbers matched: {}".format(args.check, highest)
