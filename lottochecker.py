@@ -50,7 +50,7 @@ if args.check == "lotto":
         msg = Lotto.prep_msg(winners, jackpot_info, msg_body)
         print(msg)
 
-if args.check == "lotto DP":
+elif args.check == "lotto DP":
     if args.history:
         Lotto = Game("lotto", None)
         Lotto.check_historical_data(my_numbers)
