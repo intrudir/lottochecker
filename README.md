@@ -6,15 +6,15 @@ Run with no args or -h to see usage.
 
 ```bash
 % python3 lottochecker.py
-usage: lottochecker.py [-h] [-c {powerball,megamillions,lotto}] [--history]
+usage: lottochecker.py [-h] [-c {powerball,megamillions,lotto,lotto DP}] [-H]
 
 This script is used to check for lotto numbers and see if you won.
 
 optional arguments:
   -h, --help            show this help message and exit
-  -c {powerball,megamillions,lotto}, --check {powerball,megamillions,lotto}
+  -c {powerball,megamillions,lotto,lotto DP}, --check {powerball,megamillions,lotto,lotto DP}
                         check winning numbers for specified game
-  --history             check your numbers against historical data for a game
+  -H, --history         check your numbers against historical data for a game
 ```
 <br>
 
