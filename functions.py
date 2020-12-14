@@ -89,6 +89,7 @@ def get_jackpot_nums(game_page_balls, index):
 def check_win(game_name, my_numbers, winners):
     msg_body = ""
     highest = 0
+    highest_PB = None
     # my numbers:
     for picks in my_numbers:
         msg_body += "\n{}: ".format(picks)
@@ -96,14 +97,14 @@ def check_win(game_name, my_numbers, winners):
         # powerball: [1, 2, 3, 4, 5, 6]
         for game in my_numbers[picks]:
             matched = 0
-            pbMatched = False
+            pb_matched = False
             if game.lower().find(game_name) != -1:
                 msg_body += "\n    {}: {}\n".format(game, my_numbers[picks][game])
 
                 if game_name == "lotto":
                     for n in my_numbers[picks][game]:
-                            if n in winners:
-                                matched += 1
+                        if n in winners:
+                            matched += 1
                     msg_body += "    {} numbers matched\n".format(matched)
 
                 if game_name == "powerball" or game_name == "megamillions":
@@ -113,15 +114,17 @@ def check_win(game_name, my_numbers, winners):
                     msg_body += "    {} numbers matched\n".format(matched)
 
                     if my_numbers[picks][game][-1] == winners[-1]:
-                        pbMatched = True
+                        pb_matched = True
 
-                    msg_body += "    ball matched: {}\n".format(pbMatched)
+                    msg_body += "    ball matched: {}\n".format(pb_matched)
 
             if matched:
                 if matched > highest:
                     highest = matched
+                    # If checking Lotto this should be False
+                    highest_PB = pb_matched
 
-    return msg_body, highest
+    return msg_body, highest, highest_PB
 
 
 def prep_msg(game_name, game_type, winners, jackpot_info, msg_body):
@@ -201,7 +204,7 @@ def check_history(game_name, my_numbers, history_winners):
 
                 for drawDate, hNumbers in history_winners.items():
                     matched = 0
-                    pbMatched = False
+                    pb_matched = False
 
                     if game_name == "lotto":
                         for n in my_numbers[picks][game]:
@@ -221,15 +224,15 @@ def check_history(game_name, my_numbers, history_winners):
                             if str(n) in hNumbers[:5]:
                                 matched += 1
                         if str(my_numbers[picks][game][-1]) == hNumbers[-1]:
-                            pbMatched = True
+                            pb_matched = True
 
-                        if matched == 5 and pbMatched is True:
+                        if matched == 5 and pb_matched is True:
                             print("    ALL 6 NUMBERS MATCHED: {}: {}".format(drawDate, hNumbers))
                             print()
 
                         if matched >= 3:
                             print("    3 or more numbers matched: {}: {}".format(drawDate, hNumbers))
-                            print("    {} ball matched?: {}".format(game_name, pbMatched))
+                            print("    {} ball matched?: {}".format(game_name, pb_matched))
                             print()
 
     exit()
@@ -258,9 +261,9 @@ class Game:
     def check_win(self, my_numbers, winners):
         """Check your provided numbers against winning nums."""
 
-        msg_body, highest = check_win(self.game, my_numbers, winners)
+        msg_body, highest, highest_PB = check_win(self.game, my_numbers, winners)
 
-        return msg_body, highest
+        return msg_body, highest, highest_PB
 
     def prep_msg(self, winners, jackpot_info, msg_body):
         """Prepare final results message for print and email."""
@@ -297,4 +300,3 @@ def send_mail(user, password, subject, finalResults):
     msg['Subject'] = subject
     server.login(user, password)
     server.send_message(msg)
-    
